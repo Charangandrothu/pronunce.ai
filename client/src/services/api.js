@@ -1,8 +1,7 @@
 import axios from 'axios';
 
-// Base backend API connection settings
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api'
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 });
 
 /**
@@ -104,6 +103,7 @@ export const getResults = async (sessionId) => {
  * Basic health diagnostics checking if API endpoints respond.
  */
 export const healthCheck = async () => {
-  const res = await axios.get('http://localhost:5000/health');
+  const backendUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api$/, '');
+  const res = await axios.get(`${backendUrl}/health`);
   return res.data;
 };

@@ -5,14 +5,14 @@ import { Menu, X } from 'lucide-react';
 
 function GithubIcon({ className }) {
   return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={className}
     >
       <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
@@ -58,23 +58,22 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '#about', isAnchor: true },
-    { name: 'GitHub', path: 'https://github.com', isExternal: true },
+    { name: 'GitHub', path: 'https://github.com/charangandrothu', isExternal: true },
   ];
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 pt-5">
-        <nav 
-          className={`mx-auto rounded-full w-[95%] max-w-5xl transition-all duration-300 ${
-            isScrolled 
-              ? 'glass-panel bg-[#0d0d11]/80 border-white/8 shadow-[0_12px_32px_rgba(0,0,0,0.5)] py-2 px-5' 
+        <nav
+          className={`mx-auto rounded-full w-[95%] max-w-5xl transition-all duration-300 ${isScrolled
+              ? 'glass-panel bg-[#0d0d11]/80 border-white/8 shadow-[0_12px_32px_rgba(0,0,0,0.5)] py-2 px-5'
               : 'glass-panel bg-[#121216]/40 border-white/5 py-3 px-6'
-          }`}
+            }`}
         >
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               onClick={handleLogoClick}
               className="flex items-center space-x-2 text-white hover:opacity-90 transition-opacity"
             >
@@ -119,9 +118,8 @@ export default function Navbar() {
                   <NavLink
                     key={link.name}
                     to={link.path}
-                    className={`text-xs font-medium py-1.5 px-3 relative rounded-full transition-colors duration-300 ${
-                      isActive ? 'text-white font-semibold' : 'text-slate-400 hover:text-white'
-                    }`}
+                    className={`text-xs font-medium py-1.5 px-3 relative rounded-full transition-colors duration-300 ${isActive ? 'text-white font-semibold' : 'text-slate-400 hover:text-white'
+                      }`}
                   >
                     {isActive && (
                       <motion.span
@@ -134,10 +132,10 @@ export default function Navbar() {
                   </NavLink>
                 );
               })}
-              
+
               <div className="w-[1px] h-3 bg-white/10 mx-2"></div>
-              
-              <motion.button 
+
+              <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleStartClick}
@@ -205,9 +203,8 @@ export default function Navbar() {
                     key={link.name}
                     to={link.path}
                     onClick={() => setIsOpen(false)}
-                    className={`block px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-                      isActive ? 'text-white bg-white/5 border border-white/5' : 'text-slate-400 hover:text-white hover:bg-white/5'
-                    }`}
+                    className={`block px-3 py-2 rounded-xl text-sm font-medium transition-colors ${isActive ? 'text-white bg-white/5 border border-white/5' : 'text-slate-400 hover:text-white hover:bg-white/5'
+                      }`}
                   >
                     {link.name}
                   </NavLink>
@@ -231,15 +228,15 @@ export default function Navbar() {
       <AnimatePresence>
         {showAbout && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowAbout(false)}
               className="absolute inset-0 bg-[#09090b]/80 backdrop-blur-md"
             />
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
@@ -247,11 +244,11 @@ export default function Navbar() {
             >
               <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-3.5 border-b border-white/5 pb-3">About Pronounce.AI</h3>
               <p className="text-xs text-slate-350 leading-relaxed font-light">
-                Pronounce.AI is an advanced voice analysis and oral assessment platform. 
+                Pronounce.AI is an advanced voice analysis and oral assessment platform.
                 Our neural models inspect phonetic accent structures, cadence rhythm, and word stress alignments, returning granular diagnostics to calibrate articulation towards native accents.
               </p>
-              
-              <button 
+
+              <button
                 onClick={() => setShowAbout(false)}
                 className="mt-6 w-full py-3 text-xs font-bold uppercase tracking-widest text-white bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-full transition-all cursor-pointer"
               >
