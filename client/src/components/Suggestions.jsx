@@ -2,10 +2,6 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Volume2, Mic, MicOff, CheckCircle, XCircle, BrainCircuit, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// ─── Minimum API confidence to treat a result as valid speech ────────────────
-// SpeechRecognition confidence: 0.0 (noise) – 1.0 (certain)
-// Below this we show "nothing clear detected" instead of a match.
-const MIN_CONFIDENCE = 0.45;
 
 // ─── Levenshtein distance ─────────────────────────────────────────────────────
 const levenshtein = (a, b) => {
@@ -299,43 +295,26 @@ export default function Suggestions({ suggestions = {}, practiceWords = [], summ
     recognition.onresult = (event) => {
       const result = event.results[0];
 
-      // Collect alternatives WITH their confidence scores
+      // Collect alternatives
       const alternatives = Array.from(result).map(alt => ({
-        transcript: alt.transcript.trim(),
-        confidence: alt.confidence ?? 0
+        transcript: alt.transcript.trim()
       }));
       console.log('[Speech Recognition]: Alternatives:', alternatives);
 
-      // ── Gate 1: confidence threshold ────────────────────────────────────────
-      // If the best confidence is too low, the API is guessing from noise.
-      const bestConfidence = Math.max(...alternatives.map(a => a.confidence));
-      if (bestConfidence < MIN_CONFIDENCE) {
-        console.warn(`[Speech Recognition]: Confidence too low (${bestConfidence.toFixed(2)}) — treating as no speech.`);
+      if (alternatives.length === 0 || !alternatives[0].transcript) {
         setResults(prev => ({ ...prev, [targetWord]: { notDetected: true } }));
         setRecordingWord(null);
         recognitionRef.current = null;
         return;
       }
 
-      // ── Gate 2: pick the alternative most phonetically similar to target ────
+      // Pick the alternative most phonetically similar to target
       const scored = alternatives.map(alt => ({
         spoken: alt.transcript,
-        confidence: alt.confidence,
         score: phoneSimilarity(alt.transcript, targetWord)
       }));
-      // Weight score by confidence so high-similarity + low-confidence loses to
-      // moderate-similarity + high-confidence
-      scored.sort((a, b) => (b.score * b.confidence) - (a.score * a.confidence));
+      scored.sort((a, b) => b.score - a.score);
       const best = scored[0];
-
-      // ── Gate 3: if best similarity is still very low, it's background noise ─
-      if (best.score < 20) {
-        console.warn(`[Speech Recognition]: Best match "${best.spoken}" score ${best.score} too low — noise.`);
-        setResults(prev => ({ ...prev, [targetWord]: { notDetected: true } }));
-        setRecordingWord(null);
-        recognitionRef.current = null;
-        return;
-      }
 
       setResults(prev => ({
         ...prev,
