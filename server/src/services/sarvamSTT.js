@@ -7,18 +7,22 @@ import * as mm from 'music-metadata';
 import { SARVAM_API_KEY } from '../config/env.js';
 import { SARVAM_STT_ENDPOINT, SARVAM_STT_MODEL } from '../config/sarvam.js';
 
-// ── Setup fluent-ffmpeg with bundled binary (no system ffmpeg required) ────────
+// ── Setup fluent-ffmpeg with bundled binary and system fallback ────────
 const require = createRequire(import.meta.url);
 let ffmpegPath;
 let ffmpeg;
 try {
-  ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
   const { default: _ffmpeg } = await import('fluent-ffmpeg');
-  _ffmpeg.setFfmpegPath(ffmpegPath);
+  try {
+    ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+    _ffmpeg.setFfmpegPath(ffmpegPath);
+    console.log('[STT Service]: ffmpeg ready (bundled installer) at', ffmpegPath);
+  } catch (err) {
+    console.log('[STT Service]: Bundled ffmpeg loader failed, falling back to system ffmpeg path.');
+  }
   ffmpeg = _ffmpeg;
-  console.log('[STT Service]: ffmpeg ready at', ffmpegPath);
 } catch (e) {
-  console.warn('[STT Service]: fluent-ffmpeg not available:', e.message);
+  console.warn('[STT Service]: fluent-ffmpeg is not available:', e.message);
   ffmpeg = null;
 }
 
