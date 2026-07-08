@@ -1,0 +1,24 @@
+# Dependency directories
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Local env files (crucial for API Key security)
+.env
+client/.env
+server/.env
+
+# Production build artifacts
+dist/
+client/dist/
+
+# Upload temp directories
+server/src/uploads/*
+!server/src/uploads/.gitkeep
+
+# Editor/System directories
+.vscode/
+.idea/
+.DS_Store
+*.log
+Thumbs.db
