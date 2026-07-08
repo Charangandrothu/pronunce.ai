@@ -9,10 +9,10 @@ import { uploadAudio, analyzeAudio } from '../services/analysisService';
 
 // Loading phases mapped to progress range
 const PHASES = [
-  { label: 'Uploading Audio...',         min: 0,  max: 25  },
-  { label: 'Speech Recognition...',      min: 25, max: 55  },
-  { label: 'Analyzing Pronunciation...', min: 55, max: 80  },
-  { label: 'Generating AI Report...',    min: 80, max: 99  }
+  { label: 'Uploading Audio',         min: 0,  max: 25  },
+  { label: 'Speech Recognition',      min: 25, max: 55  },
+  { label: 'Pronunciation Analysis', min: 55, max: 80  },
+  { label: 'Generating Report',    min: 80, max: 99  }
 ];
 
 export default function Home() {
@@ -67,7 +67,7 @@ export default function Home() {
         navigate('/result', {
           state: {
             audioUrl: '',
-            fileName: 'demo_recording.mp3',
+            fileName: 'english_speech_calibration.mp3',
             sessionId: 'demo',
             resultData: {
               overallScore: 84,
@@ -76,20 +76,28 @@ export default function Home() {
               clarity: 82,
               confidence: 87,
               transcript: 'Today I am introducing my pronunciation assessment project.',
+              highlights: [
+                { word: 'introducing', severity: 'warning' },
+                { word: 'pronunciation', severity: 'error' }
+              ],
               mistakes: [
                 {
                   word: 'introducing',
                   issue: 'Incorrect stress placement',
+                  whatWentWrong: 'The primary stress was placed on the first syllable instead of the third.',
+                  expected: '/ˌɪntrəˈdjuːsɪŋ/',
                   severity: 'warning',
-                  ipa: '/ˌɪntrəˈdjuːsɪŋ/',
-                  suggestion: 'Stress the third syllable: in-tro-DU-cing.'
+                  improvementPriority: 'Medium',
+                  suggestion: 'Practice saying the word slowly and place the primary emphasis on the third syllable: in-tro-DUC-ing.'
                 },
                 {
                   word: 'pronunciation',
-                  issue: 'Vowel sound in second syllable',
+                  issue: 'Incorrect vowel articulation',
+                  whatWentWrong: 'The second vowel was reduced or articulated as "noun" instead of "nun".',
+                  expected: '/prəˌnʌnsiˈeɪʃən/',
                   severity: 'error',
-                  ipa: '/prəˌnʌnsiˈeɪʃən/',
-                  suggestion: "The second syllable is /nʌn/ — rhymes with 'nun', not 'noun'."
+                  improvementPriority: 'High',
+                  suggestion: 'Ensure the second syllable is clearly pronounced as /nʌn/ to rhyme with "nun" or "run".'
                 }
               ],
               practiceWords: [
@@ -97,7 +105,7 @@ export default function Home() {
                 { word: 'pronunciation', difficulty: 'Hard',   ipa: '/prəˌnʌnsiˈeɪʃən/' },
                 { word: 'assessment',    difficulty: 'Medium', ipa: '/əˈsɛsmənt/' }
               ],
-              summary: 'Good fluency and rhythm overall. Focus on vowel precision in multisyllabic words, especially "pronunciation" and "introducing". Keep practising with the vocabulary sandbox.'
+              summary: 'Overall pronunciation shows strong alignment. Minor syllable stress and vowel articulation deviations were identified in multi-syllabic words like "introducing" and "pronunciation". Use the Practice Section to master these sound paths.'
             }
           }
         });
@@ -121,11 +129,10 @@ export default function Home() {
       if (cancelAnim) { cancelAnim(); cancelAnim = null; }
       setProgress(25);
 
-      // Phase 2: STT (25 → 55) — happens inside analyzeAudio on server
+      // Phase 2: STT (25 → 55)
       cancelAnim = animateProgress(25, 54, 8000);
 
-      // Phase 3: LLM (55 → 80) — triggered once STT finishes on server
-      // We start the next animation after a delay to simulate pipeline stages
+      // Phase 3: LLM (55 → 80)
       const phaseTimer = setTimeout(() => {
         if (cancelAnim) { cancelAnim(); cancelAnim = null; }
         cancelAnim = animateProgress(55, 79, 10000);
@@ -164,7 +171,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#03050a] text-slate-100 bg-grid-pattern relative">
+    <div className="flex flex-col min-h-screen bg-[#09090b] text-slate-100 bg-grid-pattern relative">
       {/* Noise and vignette layers */}
       <div className="noise-overlay"></div>
       <div className="vignette-mask"></div>

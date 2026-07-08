@@ -65,10 +65,10 @@ export default function Navbar() {
     <>
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 pt-5">
         <nav 
-          className={`mx-auto rounded-full w-[95%] max-w-6xl transition-all duration-300 ${
+          className={`mx-auto rounded-full w-[95%] max-w-5xl transition-all duration-300 ${
             isScrolled 
-              ? 'glass-panel bg-[#050814]/75 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] py-2.5 px-6' 
-              : 'glass-panel bg-[#070b19]/45 border-white/5 py-3.5 px-8'
+              ? 'glass-panel bg-[#0d0d11]/80 border-white/8 shadow-[0_12px_32px_rgba(0,0,0,0.5)] py-2 px-5' 
+              : 'glass-panel bg-[#121216]/40 border-white/5 py-3 px-6'
           }`}
         >
           <div className="flex items-center justify-between">
@@ -78,14 +78,14 @@ export default function Navbar() {
               onClick={handleLogoClick}
               className="flex items-center space-x-2 text-white hover:opacity-90 transition-opacity"
             >
-              <img src="/logoo.png" alt="Logo" className="h-7 w-auto object-contain rounded-md" />
-              <span className="font-extrabold text-sm tracking-wider uppercase bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                PRONUNCE.<span className="text-cyan-400">AI</span>
+              <img src="/logoo.png" alt="Logo" className="h-6 w-auto object-contain rounded-md" />
+              <span className="font-extrabold text-xs tracking-wider uppercase bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                PRONUNCE.<span className="text-white">AI</span>
               </span>
             </Link>
 
             {/* Desktop Links */}
-            <div className="hidden md:flex items-center space-x-2">
+            <div className="hidden md:flex items-center space-x-1">
               {navLinks.map((link) => {
                 if (link.isExternal) {
                   return (
@@ -94,9 +94,9 @@ export default function Navbar() {
                       href={link.path}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center space-x-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors py-2 px-4 rounded-full"
+                      className="flex items-center space-x-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors py-1.5 px-3 rounded-full hover:bg-white/5"
                     >
-                      <GithubIcon className="h-3.5 w-3.5" />
+                      <GithubIcon className="h-3 w-3" />
                       <span>{link.name}</span>
                     </a>
                   );
@@ -107,7 +107,7 @@ export default function Navbar() {
                     <button
                       key={link.name}
                       onClick={() => setShowAbout(true)}
-                      className="text-xs font-semibold text-slate-400 hover:text-white transition-colors py-2 px-4 rounded-full cursor-pointer"
+                      className="text-xs font-medium text-slate-400 hover:text-white transition-colors py-1.5 px-3 rounded-full hover:bg-white/5 cursor-pointer"
                     >
                       {link.name}
                     </button>
@@ -119,14 +119,14 @@ export default function Navbar() {
                   <NavLink
                     key={link.name}
                     to={link.path}
-                    className={`text-xs font-semibold py-2 px-4 relative rounded-full transition-colors duration-300 ${
-                      isActive ? 'text-white' : 'text-slate-400 hover:text-white'
+                    className={`text-xs font-medium py-1.5 px-3 relative rounded-full transition-colors duration-300 ${
+                      isActive ? 'text-white font-semibold' : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     {isActive && (
                       <motion.span
                         layoutId="activeNavBackground"
-                        className="absolute inset-0 bg-white/5 border border-white/10 rounded-full"
+                        className="absolute inset-0 bg-white/5 border border-white/8 rounded-full"
                         transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                       />
                     )}
@@ -135,14 +135,16 @@ export default function Navbar() {
                 );
               })}
               
-              <div className="w-[1px] h-4 bg-white/10 mx-2"></div>
+              <div className="w-[1px] h-3 bg-white/10 mx-2"></div>
               
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleStartClick}
-                className="px-4.5 py-2 text-xs font-bold text-slate-950 bg-white hover:bg-cyan-400 rounded-full shadow-lg transition-all duration-300 transform active:scale-95 cursor-pointer"
+                className="px-4 py-1.5 text-xs font-medium text-white bg-zinc-900 border border-white/10 hover:bg-zinc-850 rounded-full shadow-md transition-all cursor-pointer"
               >
                 Analyze Speech
-              </button>
+              </motion.button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -165,7 +167,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden mx-auto mt-2 rounded-2xl w-[95%] glass-panel bg-slate-950/95 shadow-2xl p-4 space-y-2 border border-white/10"
+              className="md:hidden mx-auto mt-2 rounded-2xl w-[95%] glass-panel bg-zinc-950/95 shadow-2xl p-4 space-y-2 border border-white/8"
             >
               {navLinks.map((link) => {
                 if (link.isExternal) {
@@ -176,7 +178,7 @@ export default function Navbar() {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-2 px-3 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+                      className="flex items-center space-x-2 px-3 py-2 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
                     >
                       <GithubIcon className="h-4 w-4" />
                       <span>{link.name}</span>
@@ -191,7 +193,7 @@ export default function Navbar() {
                         setIsOpen(false);
                         setShowAbout(true);
                       }}
-                      className="block w-full text-left px-3 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                      className="block w-full text-left px-3 py-2 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       {link.name}
                     </button>
@@ -203,7 +205,7 @@ export default function Navbar() {
                     key={link.name}
                     to={link.path}
                     onClick={() => setIsOpen(false)}
-                    className={`block px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                    className={`block px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                       isActive ? 'text-white bg-white/5 border border-white/5' : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`}
                   >
@@ -216,7 +218,7 @@ export default function Navbar() {
                   setIsOpen(false);
                   handleStartClick(e);
                 }}
-                className="block w-full text-center px-4 py-2.5 mt-4 text-xs font-extrabold text-slate-950 bg-white hover:bg-cyan-400 rounded-full shadow-md cursor-pointer"
+                className="block w-full text-center px-4 py-2.5 mt-4 text-xs font-semibold text-white bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-full shadow-md cursor-pointer"
               >
                 Analyze Speech
               </button>
@@ -234,27 +236,24 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowAbout(false)}
-              className="absolute inset-0 bg-[#03050a]/80 backdrop-blur-md"
+              className="absolute inset-0 bg-[#09090b]/80 backdrop-blur-md"
             />
             
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              initial={{ opacity: 0, scale: 0.96, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative z-10 w-full max-w-md glass-panel border-white/10 bg-[#070c1a]/95 rounded-3xl p-6 sm:p-7 shadow-2xl overflow-hidden shimmer-effect"
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              className="relative z-10 w-full max-w-md glass-panel border-white/8 bg-zinc-950/95 rounded-3xl p-6 sm:p-7 shadow-2xl overflow-hidden shimmer-effect"
             >
-              <div className="absolute -right-12 -top-12 w-28 h-28 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
-              <div className="absolute -left-12 -bottom-12 w-28 h-28 bg-violet-600/10 rounded-full blur-2xl pointer-events-none"></div>
-
-              <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-3.5 border-b border-white/5 pb-3">About Pronounce.AI</h3>
-              <p className="text-xs text-slate-300 leading-relaxed font-light">
+              <h3 className="text-xs font-bold text-white uppercase tracking-widest mb-3.5 border-b border-white/5 pb-3">About Pronounce.AI</h3>
+              <p className="text-xs text-slate-350 leading-relaxed font-light">
                 Pronounce.AI is an advanced voice analysis and oral assessment platform. 
                 Our neural models inspect phonetic accent structures, cadence rhythm, and word stress alignments, returning granular diagnostics to calibrate articulation towards native accents.
               </p>
               
               <button 
                 onClick={() => setShowAbout(false)}
-                className="mt-6 w-full py-3 text-xs font-bold uppercase tracking-widest text-slate-950 bg-white hover:bg-cyan-400 rounded-full transition-all cursor-pointer"
+                className="mt-6 w-full py-3 text-xs font-bold uppercase tracking-widest text-white bg-zinc-900 border border-white/10 hover:bg-zinc-800 rounded-full transition-all cursor-pointer"
               >
                 Dismiss Panel
               </button>

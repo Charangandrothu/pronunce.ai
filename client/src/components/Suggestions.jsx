@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Volume2, Mic, MicOff, CheckCircle, XCircle, BrainCircuit, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-
 // ─── Levenshtein distance ─────────────────────────────────────────────────────
 const levenshtein = (a, b) => {
   const m = a.length, n = b.length;
@@ -21,19 +20,11 @@ const levenshtein = (a, b) => {
 
 /**
  * Multi-factor phonetic similarity score (0–100).
- * Combines:
- *  - Character-level Levenshtein similarity (60% weight)
- *  - First-letter match bonus              (20% weight)
- *  - First 3-char prefix match bonus       (20% weight)
- *
- * Only the FIRST WORD of `spoken` is compared — so if the user says
- * a sentence, we grab the single word closest to the target.
  */
 const phoneSimilarity = (spokenRaw, target) => {
   if (!spokenRaw || !target) return 0;
   const b = target.toLowerCase().trim();
 
-  // Grab the single word from what was spoken that's most like the target
   const words = spokenRaw.toLowerCase().trim().split(/\s+/);
   const a = words.reduce((best, w) => {
     const d = levenshtein(w, b);
@@ -44,13 +35,8 @@ const phoneSimilarity = (spokenRaw, target) => {
   const maxLen = Math.max(a.length, b.length);
   if (maxLen === 0) return 100;
 
-  // Base Levenshtein score
   const levScore = ((maxLen - levenshtein(a, b)) / maxLen) * 60;
-
-  // First letter match
   const letterBonus = a[0] === b[0] ? 20 : 0;
-
-  // First 3 chars prefix match
   const prefix = Math.min(3, b.length);
   const prefixMatch = a.slice(0, prefix) === b.slice(0, prefix) ? 20 : 0;
 
@@ -63,50 +49,49 @@ const getSpeechRecognition = () => {
   return SR ? new SR() : null;
 };
 
-// ─── Difficulty badge ─────────────────────────────────────────────────────────
+// ─── Difficulty badge (Stripe-like monochrome) ──────────────────────────────
 const DifficultyBadge = ({ difficulty }) => {
   const level = difficulty?.toLowerCase();
   const styles = level === 'hard'
-    ? 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+    ? 'bg-red-500/5 border-red-500/10 text-red-405'
     : level === 'easy'
-      ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-      : 'bg-amber-500/10 border-amber-500/20 text-amber-400';
+      ? 'bg-slate-500/5 border-slate-500/10 text-slate-400'
+      : 'bg-amber-500/5 border-amber-500/10 text-amber-405';
   return (
-    <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${styles}`}>
+    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${styles}`}>
       {difficulty || 'Medium'}
     </span>
   );
 };
 
-// ─── Result pill ──────────────────────────────────────────────────────────────
-// Uses hardcoded Tailwind classes (not dynamic strings) to prevent purging.
+// ─── Result pill with green success and color type accents ───────────────────
 const RESULT_STYLES = {
   notDetected: {
-    wrap:  'bg-slate-800/60 border-slate-600/30',
+    wrap:  'bg-zinc-900 border-zinc-800/80',
     text:  'text-slate-400',
-    score: 'text-slate-400 bg-slate-700/30 border-slate-600/30',
-    label: '🎙 Nothing detected — please speak clearly into your mic.',
+    score: 'text-slate-400 bg-white/5 border-white/5',
+    label: '🎙 Nothing detected — speak clearly.',
     Icon:  MicOff
   },
   excellent: {
-    wrap:  'bg-emerald-500/10 border-emerald-500/20',
+    wrap:  'bg-emerald-950/20 border-emerald-500/20',
     text:  'text-emerald-400',
     score: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-    label: '✅ Excellent pronunciation!',
+    label: 'Excellent pronunciation!',
     Icon:  CheckCircle
   },
   good: {
-    wrap:  'bg-amber-500/10 border-amber-500/20',
+    wrap:  'bg-amber-950/20 border-amber-500/20',
     text:  'text-amber-400',
     score: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
-    label: '⚠️ Close — keep practising',
+    label: 'Close — keep practicing',
     Icon:  AlertTriangle
   },
   poor: {
-    wrap:  'bg-rose-500/10 border-rose-500/20',
-    text:  'text-rose-400',
-    score: 'text-rose-400 bg-rose-500/10 border-rose-500/20',
-    label: '❌ Try again — say the word clearly',
+    wrap:  'bg-red-950/20 border-red-500/20',
+    text:  'text-red-400',
+    score: 'text-red-400 bg-red-500/10 border-red-500/20',
+    label: 'Try again — articulate clearly',
     Icon:  XCircle
   }
 };
@@ -123,25 +108,25 @@ const ResultPill = ({ score, spokenWord, notDetected }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
-      className={`mt-4 p-4 rounded-2xl border shadow-lg ${s.wrap}`}
+      exit={{ opacity: 0, y: 4 }}
+      className={`mt-3 p-3.5 rounded-xl border shadow-md ${s.wrap}`}
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center space-x-3 min-w-0">
-          <Icon className={`h-5 w-5 shrink-0 ${s.text}`} />
+        <div className="flex items-center space-x-2.5 min-w-0">
+          <Icon className={`h-4 w-4 shrink-0 ${s.text}`} />
           <div className="min-w-0">
             {!notDetected && (
-              <p className="text-xs font-semibold text-slate-300 truncate">
-                You said: <strong className="text-white">&ldquo;{spokenWord}&rdquo;</strong>
+              <p className="text-xs font-semibold text-slate-200 truncate">
+                You said: &ldquo;{spokenWord}&rdquo;
               </p>
             )}
             <p className={`text-[10px] mt-0.5 ${s.text}`}>{s.label}</p>
           </div>
         </div>
         {!notDetected && (
-          <span className={`text-sm font-extrabold px-3 py-1 rounded-lg border shrink-0 ${s.score}`}>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${s.score}`}>
             {score}%
           </span>
         )}
@@ -155,17 +140,22 @@ function WordRow({ item, isRecording, isDisabled, result, onListen, onRecord }) 
   const active = isRecording;
 
   return (
-    <div className={`flex flex-col gap-2 p-4 rounded-2xl border transition-all duration-200 ${
+    <div className={`flex flex-col gap-2.5 p-4.5 rounded-2xl border transition-all duration-300 ${
       active
-        ? 'bg-violet-600/10 border-violet-500/30'
-        : 'bg-white/[0.01] hover:bg-white/[0.02] border-white/5 hover:border-white/10'
+        ? 'bg-zinc-900 border-slate-700/30'
+        : 'bg-[#121215]/30 hover:bg-[#121215]/50 border-white/5'
     }`}>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         {/* Word info */}
         <div>
           <div className="flex items-center space-x-2">
-            <span className="text-sm font-bold text-slate-200 capitalize">{item.word}</span>
+            <span className="text-sm font-semibold text-slate-200 capitalize">{item.word}</span>
             <DifficultyBadge difficulty={item.difficulty} />
+            {result && !result.notDetected && (
+              <span className="inline-flex items-center text-[9px] text-emerald-400 font-semibold bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-500/15">
+                Recently Practiced
+              </span>
+            )}
           </div>
           <span className="text-xs font-mono text-slate-500 mt-1 block tracking-wider">
             {item.ipa || '/.../'}
@@ -179,7 +169,7 @@ function WordRow({ item, isRecording, isDisabled, result, onListen, onRecord }) 
             onClick={() => onListen(item.word)}
             className="flex items-center space-x-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-all cursor-pointer border border-white/5"
           >
-            <Volume2 className="h-3.5 w-3.5 text-cyan-400" />
+            <Volume2 className="h-3.5 w-3.5 text-slate-450" />
             <span>Listen</span>
           </button>
 
@@ -189,10 +179,10 @@ function WordRow({ item, isRecording, isDisabled, result, onListen, onRecord }) 
             disabled={isDisabled}
             className={`flex items-center space-x-1.5 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all shadow-md ${
               active
-                ? 'bg-rose-500 text-white cursor-pointer animate-pulse'
+                ? 'bg-red-600 text-white cursor-pointer animate-pulse'
                 : isDisabled
-                  ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-                  : 'text-slate-950 bg-white hover:bg-cyan-400 cursor-pointer'
+                  ? 'bg-slate-800 text-slate-600 cursor-not-allowed border border-transparent'
+                  : 'text-white bg-zinc-900 border border-white/10 hover:bg-zinc-800 cursor-pointer'
             }`}
           >
             {active ? (
@@ -204,19 +194,26 @@ function WordRow({ item, isRecording, isDisabled, result, onListen, onRecord }) 
         </div>
       </div>
 
-      {/* Recording indicator */}
+      {/* Recording & Real-time hearing indicator */}
       <AnimatePresence>
         {active && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex items-center space-x-2 pt-1"
+            className="flex flex-col gap-1.5 pt-1.5 border-t border-white/5 mt-1"
           >
-            <div className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />
-            <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest">
-              Listening — say &ldquo;<span className="text-white capitalize">{item.word}</span>&rdquo; now...
-            </span>
+            <div className="flex items-center space-x-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                Listening...
+              </span>
+            </div>
+            {result && result.spokenWord && (
+              <p className="text-xs text-slate-350 italic">
+                Hearing: &ldquo;<span className="text-white font-medium capitalize">{result.spokenWord}</span>&rdquo;
+              </p>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -238,7 +235,7 @@ function WordRow({ item, isRecording, isDisabled, result, onListen, onRecord }) 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function Suggestions({ suggestions = {}, practiceWords = [], summary = '' }) {
   const [recordingWord, setRecordingWord] = useState(null);  // word currently being recorded
-  const [results, setResults]             = useState({});     // { word: { score, spokenWord } }
+  const [results, setResults]             = useState({});     // { word: { score, spokenWord, notDetected } }
   const [srError, setSrError]             = useState('');     // SR not supported
   const recognitionRef                    = useRef(null);
 
@@ -266,15 +263,13 @@ export default function Suggestions({ suggestions = {}, practiceWords = [], summ
     setRecordingWord(null);
   }, []);
 
-  // ── Record (real Speech Recognition) ────────────────────────────────────────
+  // ── Record (real Speech Recognition with real-time interim updates) ────────
   const handleRecord = useCallback((targetWord) => {
-    // If already recording this word — stop
     if (recordingWord === targetWord) {
       stopRecognition();
       return;
     }
 
-    // Stop any previous session
     stopRecognition();
     setSrError('');
 
@@ -285,43 +280,39 @@ export default function Suggestions({ suggestions = {}, practiceWords = [], summ
     }
 
     recognition.lang              = 'en-US';
-    recognition.interimResults    = false;
+    recognition.interimResults    = true; // Enable real-time updates as you speak!
     recognition.maxAlternatives   = 5;
     recognition.continuous        = false;
 
     setRecordingWord(targetWord);
     recognitionRef.current = recognition;
 
+    // Reset current word results so it registers fresh audio stream
+    setResults(prev => ({
+      ...prev,
+      [targetWord]: null
+    }));
+
     recognition.onresult = (event) => {
-      const result = event.results[0];
+      let finalTranscript = '';
+      let interimTranscript = '';
 
-      // Collect alternatives
-      const alternatives = Array.from(result).map(alt => ({
-        transcript: alt.transcript.trim()
-      }));
-      console.log('[Speech Recognition]: Alternatives:', alternatives);
-
-      if (alternatives.length === 0 || !alternatives[0].transcript) {
-        setResults(prev => ({ ...prev, [targetWord]: { notDetected: true } }));
-        setRecordingWord(null);
-        recognitionRef.current = null;
-        return;
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
       }
 
-      // Pick the alternative most phonetically similar to target
-      const scored = alternatives.map(alt => ({
-        spoken: alt.transcript,
-        score: phoneSimilarity(alt.transcript, targetWord)
-      }));
-      scored.sort((a, b) => b.score - a.score);
-      const best = scored[0];
-
-      setResults(prev => ({
-        ...prev,
-        [targetWord]: { score: best.score, spokenWord: best.spoken, notDetected: false }
-      }));
-      setRecordingWord(null);
-      recognitionRef.current = null;
+      const text = (finalTranscript || interimTranscript).trim();
+      if (text) {
+        const score = phoneSimilarity(text, targetWord);
+        setResults(prev => ({
+          ...prev,
+          [targetWord]: { score, spokenWord: text, notDetected: false }
+        }));
+      }
     };
 
     recognition.onerror = (event) => {
@@ -338,7 +329,14 @@ export default function Suggestions({ suggestions = {}, practiceWords = [], summ
     };
 
     recognition.onend = () => {
-      // If result wasn't set and we're still showing as recording, it timed out
+      // Auto-fallback: if recording ended but no voice data was registered in state,
+      // explicitly trigger a Not Detected visual pill.
+      setResults(prev => {
+        if (!prev[targetWord]) {
+          return { ...prev, [targetWord]: { notDetected: true } };
+        }
+        return prev;
+      });
       setRecordingWord(prev => (prev === targetWord ? null : prev));
       if (recognitionRef.current) recognitionRef.current = null;
     };
@@ -352,20 +350,17 @@ export default function Suggestions({ suggestions = {}, practiceWords = [], summ
   }, [recordingWord, stopRecognition]);
 
   return (
-    <div className="glass-panel border-white/5 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden h-full ambient-card-glow hover:border-white/10">
-      {/* Background glow */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-violet-600/5 rounded-full blur-2xl pointer-events-none" />
-
+    <div className="glass-panel bg-[#121215]/50 border border-white/5 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden h-full">
       {/* Header */}
-      <div className="flex items-center space-x-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
-        <BrainCircuit className="h-4.5 w-4.5 text-cyan-400" />
-        <span>Vocal Practice Sandbox</span>
+      <div className="flex items-center space-x-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">
+        <BrainCircuit className="h-4 w-4 text-slate-400" />
+        <span>Practice Section</span>
       </div>
 
-      <h3 className="text-lg font-bold text-white mb-2">Practice Challenging Vocabulary</h3>
-      <p className="text-xs text-slate-400 leading-relaxed mb-6 font-light">
-        Click <strong className="text-slate-300">Listen</strong> to hear the correct pronunciation, then click{' '}
-        <strong className="text-slate-300">Record</strong> and say the word — your microphone score is compared against the target word in real time.
+      <h3 className="text-lg font-semibold text-white mb-2">Practice Challenging Vocabulary</h3>
+      <p className="text-xs text-slate-455 leading-relaxed mb-6 font-light">
+        Click <strong className="text-slate-350">Listen</strong> to hear the correct pronunciation, then click{' '}
+        <strong className="text-slate-355">Record</strong> and say the word — your microphone score is compared against the target word in real time.
       </p>
 
       {/* SR not supported error */}
@@ -375,16 +370,16 @@ export default function Suggestions({ suggestions = {}, practiceWords = [], summ
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start space-x-2 text-xs text-rose-300"
+            className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start space-x-2 text-xs text-red-400"
           >
-            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-rose-400" />
+            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-red-450" />
             <span>{srError}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Words list */}
-      <div className="space-y-3">
+      <div className="space-y-3.5">
         {activeWords.length > 0 ? (
           activeWords.map((item, idx) => (
             <WordRow
@@ -406,9 +401,9 @@ export default function Suggestions({ suggestions = {}, practiceWords = [], summ
 
       {/* Feedback summary */}
       {activeFeedback && (
-        <div className="mt-6 pt-6 border-t border-white/5 text-xs text-slate-500 leading-relaxed font-light">
+        <div className="mt-6 pt-6 border-t border-white/5 text-xs text-slate-455 leading-relaxed font-light">
           <span className="font-bold text-slate-400 block mb-1.5 uppercase tracking-widest text-[9px]">
-            AI Feedback Summary
+            AI Assessment Summary
           </span>
           {activeFeedback}
         </div>

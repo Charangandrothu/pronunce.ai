@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Volume2, Activity, Sparkles, ShieldCheck } from 'lucide-react';
 
-function MetricItem({ label, score, icon, colorClass }) {
+function MetricItem({ label, score, icon, description }) {
   const [displayScore, setDisplayScore] = useState(0);
 
   useEffect(() => {
@@ -25,26 +25,26 @@ function MetricItem({ label, score, icon, colorClass }) {
 
   return (
     <motion.div 
-      whileHover={{ y: -3, scale: 1.01 }}
-      className="glass-panel border-white/5 rounded-2xl p-5 relative overflow-hidden shadow-lg flex flex-col justify-between hover:border-white/10"
+      whileHover={{ y: -2 }}
+      className="glass-panel bg-[#121215]/50 border border-white/5 rounded-2xl p-5 relative overflow-hidden shadow-md flex flex-col justify-between"
     >
-      {/* Accent Glow Backlight */}
-      <div className="absolute -right-12 -top-12 w-24 h-24 bg-white/[0.01] rounded-full blur-xl"></div>
-
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2.5 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start space-x-3">
+          <div className="p-2 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-slate-450 shrink-0">
             {icon}
           </div>
-          <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{label}</span>
+          <div>
+            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block">{label}</span>
+            <p className="text-[10px] text-slate-500 font-light mt-1.5 leading-snug">{description}</p>
+          </div>
         </div>
-        <span className="text-base font-extrabold text-white">{displayScore}%</span>
+        <span className="text-sm font-extrabold text-white shrink-0">{displayScore}%</span>
       </div>
 
       <div className="mt-5">
-        <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
+        <div className="w-full bg-white/5 rounded-full h-1 overflow-hidden border border-white/5">
           <motion.div
-            className={`bg-gradient-to-r ${colorClass} h-full rounded-full shadow-[0_0_10px_rgba(255,255,255,0.05)]`}
+            className="bg-slate-400 h-full rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${score}%` }}
             transition={{ duration: 1.2, ease: "easeOut", delay: 0.15 }}
@@ -67,26 +67,26 @@ export default function MetricsCard({ metrics = {}, pronunciation, fluency, clar
     pronunciation: {
       score: pick('pronunciation', pronunciation),
       label: 'Pronunciation',
-      icon: <Volume2 className="h-4.5 w-4.5 text-violet-400" />,
-      colorClass: 'from-violet-500 to-indigo-500 shadow-violet-500/10'
+      description: 'Syllable stress and phoneme articulation index.',
+      icon: <Volume2 className="h-4 w-4" />
     },
     fluency: {
       score: pick('fluency', fluency),
       label: 'Fluency',
-      icon: <Activity className="h-4.5 w-4.5 text-cyan-400" />,
-      colorClass: 'from-cyan-500 to-blue-500 shadow-cyan-500/10'
+      description: 'Tempo, pause distribution, and rhythm cadence.',
+      icon: <Activity className="h-4 w-4" />
     },
     clarity: {
       score: pick('clarity', clarity),
       label: 'Clarity',
-      icon: <Sparkles className="h-4.5 w-4.5 text-pink-400" />,
-      colorClass: 'from-pink-500 to-rose-500 shadow-pink-500/10'
+      description: 'Vocal stability and clean speech sound projection.',
+      icon: <Sparkles className="h-4 w-4" />
     },
     confidence: {
       score: pick('confidence', confidence),
       label: 'Confidence',
-      icon: <ShieldCheck className="h-4.5 w-4.5 text-emerald-400" />,
-      colorClass: 'from-emerald-500 to-teal-500 shadow-emerald-500/10'
+      description: 'Articulative certainty and steady signal speed.',
+      icon: <ShieldCheck className="h-4 w-4" />
     }
   };
 
@@ -95,7 +95,7 @@ export default function MetricsCard({ metrics = {}, pronunciation, fluency, clar
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
+        staggerChildren: 0.08
       }
     }
   };
@@ -113,7 +113,7 @@ export default function MetricsCard({ metrics = {}, pronunciation, fluency, clar
           label={item.label}
           score={item.score}
           icon={item.icon}
-          colorClass={item.colorClass}
+          description={item.description}
         />
       ))}
     </motion.div>

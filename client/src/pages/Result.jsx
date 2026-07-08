@@ -67,7 +67,7 @@ export default function Result() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#03050a] text-slate-100 bg-grid-pattern relative">
+    <div className="flex flex-col min-h-screen bg-[#09090b] text-slate-100 bg-grid-pattern relative">
       <div className="noise-overlay" />
       <div className="vignette-mask" />
 
@@ -77,10 +77,10 @@ export default function Result() {
       <div className="radial-glow glow-cyan   top-[40%] left-[5%]  w-[550px] h-[550px]" />
       <div className="radial-glow glow-pink   bottom-[10%] right-[15%] w-[500px] h-[500px]" />
 
-      <main className="flex-grow max-w-7xl w-full mx-auto px-6 lg:px-8 py-24 md:py-28 z-10">
+      <main className="flex-grow max-w-5xl w-full mx-auto px-6 lg:px-8 py-24 md:py-28 z-10">
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-            <Loader2 className="h-10 w-10 text-cyan-400 animate-spin" />
+            <Loader2 className="h-10 w-10 text-slate-400 animate-spin" />
             <h2 className="text-lg font-bold mt-6 text-slate-200 uppercase tracking-wider">
               Retrieving Diagnostics
             </h2>
@@ -105,21 +105,23 @@ export default function Result() {
                   <span>Exit to Console</span>
                 </button>
                 <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-3">
-                  Calibration Report
+                  Pronunciation Assessment Report
                 </h1>
                 <p className="text-xs text-slate-500 mt-1.5 font-light">
                   Source Clip: <span className="font-mono text-slate-400 break-all">{fileName || 'speech_sample.mp3'}</span>
                 </p>
               </div>
 
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 type="button"
                 onClick={handleRetake}
-                className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-950 bg-white hover:bg-cyan-400 rounded-full shadow-lg transition-all cursor-pointer transform active:scale-95"
+                className="inline-flex items-center justify-center space-x-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-950 bg-white hover:bg-slate-100 rounded-full shadow-lg transition-all cursor-pointer"
               >
                 <RefreshCw className="h-3.5 w-3.5 shrink-0" />
-                <span>Re-calibrate</span>
-              </button>
+                <span>Re-assess</span>
+              </motion.button>
             </div>
 
             {/* ── Top grid: Score + Metrics + Player ── */}
@@ -137,11 +139,11 @@ export default function Result() {
                 />
 
                 {/* Audio player with forwarded ref for seeking */}
-                <div className="glass-panel border-white/5 rounded-2xl p-4">
+                <div className="glass-panel bg-[#121215]/50 border border-white/5 rounded-2xl p-4">
                   <span className="text-[9px] text-slate-500 uppercase tracking-widest block mb-3 font-bold">
-                    Calibrated Input Playback
+                    Uploaded Recording
                   </span>
-                  <AudioPlayer ref={audioPlayerRef} src={audioUrl} />
+                  <AudioPlayer ref={audioPlayerRef} src={audioUrl} mistakes={data.mistakes || []} />
                 </div>
               </div>
             </div>
@@ -168,13 +170,13 @@ export default function Result() {
           </motion.div>
         ) : (
           <div className="text-center py-20">
-            <p className="text-sm text-slate-400 font-light">Speech Calibration matrix is empty.</p>
+            <p className="text-sm text-slate-400 font-light">Speech Assessment report is empty.</p>
             <button
               type="button"
               onClick={handleRetake}
-              className="mt-6 px-6 py-3 rounded-full bg-white hover:bg-cyan-400 text-slate-950 text-xs font-bold uppercase tracking-widest transition-all"
+              className="mt-6 px-6 py-3 rounded-full bg-white hover:bg-slate-100 text-zinc-950 text-xs font-bold uppercase tracking-widest transition-all"
             >
-              Calibrate Voice Sample
+              Assess Voice Sample
             </button>
           </div>
         )}
