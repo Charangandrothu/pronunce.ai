@@ -19,11 +19,27 @@ app.use(express.json());
 // Log HTTP requests in developer format
 app.use(morgan('dev'));
 
+// Basic root greeting
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Welcome to the Pronounce.AI API root. Use POST /api/upload and POST /api/analyze for evaluations.'
+  });
+});
+
 // Basic health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'API system is operational.'
+  });
+});
+
+// Welcome message for API sub-path
+app.get('/api', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Welcome to the Pronounce.AI Calibration API endpoint. Active and ready.'
   });
 });
 
