@@ -114,7 +114,7 @@ export const evaluatePronunciation = async (transcript) => {
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user',   content: userMessage }
       ],
-      temperature: 0.3,
+      temperature: 0.0,
       max_tokens: 2500
     };
 
