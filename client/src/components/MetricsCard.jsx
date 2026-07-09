@@ -26,7 +26,7 @@ function MetricItem({ label, score, icon, description }) {
   return (
     <motion.div 
       whileHover={{ y: -2 }}
-      className="glass-panel bg-[#121215]/50 border border-white/5 rounded-2xl p-5 relative overflow-hidden shadow-md flex flex-col justify-between"
+      className="glass-panel glow-card bg-[#121215]/50 border border-white/5 rounded-2xl p-5 relative overflow-hidden shadow-md flex flex-col justify-between"
     >
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">

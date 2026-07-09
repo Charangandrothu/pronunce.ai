@@ -63,7 +63,7 @@ export default function ScoreCard({ score = 0 }) {
   const level = getLevelDetails(score);
 
   return (
-    <div className="glass-panel bg-[#121215]/50 border border-white/5 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center shadow-xl relative overflow-hidden h-full">
+    <div className="glass-panel glow-card bg-[#121215]/50 border border-white/5 rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center text-center shadow-xl relative overflow-hidden h-full">
       <div className="flex items-center space-x-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">
         <Target className="h-4 w-4 text-slate-400" />
         <span>Overall Pronunciation Score</span>

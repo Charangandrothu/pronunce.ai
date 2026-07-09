@@ -150,7 +150,7 @@ export default function MistakeCard({
 
     const tokens = activeTranscript.split(/(\s+)/); // keep spaces
     return (
-      <div className="leading-relaxed text-sm sm:text-base text-slate-300 bg-[#121215]/30 rounded-2xl p-5 border border-white/5">
+      <div className="leading-relaxed text-sm sm:text-base text-slate-300 bg-[#121215]/30 rounded-2xl p-5 border border-white/5 glow-card">
         {tokens.map((token, idx) => {
           if (/^\s+$/.test(token)) return <span key={idx}>{token}</span>;
           const clean = token.replace(/[^a-zA-Z]/g, '').toLowerCase();
@@ -228,7 +228,7 @@ export default function MistakeCard({
                 <div
                   key={mistake.id}
                   onClick={() => toggle(mistake.id)}
-                  className={`border rounded-2xl p-4 transition-all duration-300 cursor-pointer overflow-hidden
+                  className={`border rounded-2xl p-4 transition-all duration-300 cursor-pointer overflow-hidden glow-card
                     ${isOpen ? s.activeBg : `${s.cardBg} border-white/5`}`}
                 >
                   {/* Card header */}

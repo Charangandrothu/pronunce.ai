@@ -143,7 +143,7 @@ function WordRow({ item, isRecording, isDisabled, result, onListen, onRecord }) 
     <div className={`flex flex-col gap-2.5 p-4.5 rounded-2xl border transition-all duration-300 ${
       active
         ? 'bg-zinc-900 border-slate-700/30'
-        : 'bg-[#121215]/30 hover:bg-[#121215]/50 border-white/5'
+        : 'bg-[#121215]/30 hover:bg-[#121215]/50 border-white/5 glow-card'
     }`}>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         {/* Word info */}
@@ -350,7 +350,7 @@ export default function Suggestions({ suggestions = {}, practiceWords = [], summ
   }, [recordingWord, stopRecognition]);
 
   return (
-    <div className="glass-panel bg-[#121215]/50 border border-white/5 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden h-full">
+    <div className="glass-panel glow-card bg-[#121215]/50 border border-white/5 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden h-full">
       {/* Header */}
       <div className="flex items-center space-x-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">
         <BrainCircuit className="h-4 w-4 text-slate-400" />

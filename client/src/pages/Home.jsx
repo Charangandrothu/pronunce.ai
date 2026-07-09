@@ -6,6 +6,8 @@ import UploadCard from '../components/UploadCard';
 import LoadingCard from '../components/LoadingCard';
 import Footer from '../components/Footer';
 import { uploadAudio, analyzeAudio } from '../services/analysisService';
+import { motion, AnimatePresence } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
 
 // Loading phases mapped to progress range
 const PHASES = [
@@ -18,6 +20,7 @@ const PHASES = [
 export default function Home() {
   const [isAnalyzing, setIsAnalyzing]   = useState(false);
   const [progress,    setProgress]      = useState(0);
+  const [pipelineError, setPipelineError] = useState(null); // Local error modal state instead of browser alerts
   const navigate  = useNavigate();
   const location  = useLocation();
   const uploadRef = useRef(null);
@@ -52,6 +55,7 @@ export default function Home() {
   const handleUploadSuccess = async (file) => {
     setIsAnalyzing(true);
     setProgress(0);
+    setPipelineError(null);
 
     // Phase 1 — demo bypass
     if (file?.isDemo) {
@@ -164,7 +168,7 @@ export default function Home() {
     } catch (err) {
       if (cancelAnim) cancelAnim();
       console.error('[Home]: Analysis pipeline error:', err);
-      alert('Unable to analyze pronunciation. Please upload another English audio between 30–45 seconds.');
+      setPipelineError('Unable to analyze pronunciation. Please upload another English audio between 30–45 seconds.');
       setIsAnalyzing(false);
       setProgress(0);
     }
@@ -183,19 +187,72 @@ export default function Home() {
       <div className="radial-glow glow-cyan top-[30%] right-[5%] w-[600px] h-[600px]"></div>
       <div className="radial-glow glow-pink bottom-[10%] left-[15%] w-[550px] h-[550px]"></div>
 
-      <main className="flex-grow flex flex-col justify-center pb-24 z-10">
-        {!isAnalyzing ? (
-          <>
-            <Hero onStartClick={handleStartClick} />
-            <div ref={uploadRef} id="uploader-section" className="scroll-mt-28">
-              <UploadCard onUploadSuccess={handleUploadSuccess} />
+      <main className="flex-grow flex flex-col justify-center pb-24 z-10 relative">
+        <Hero onStartClick={handleStartClick} />
+        <div ref={uploadRef} id="uploader-section" className="scroll-mt-28">
+          <UploadCard onUploadSuccess={handleUploadSuccess} />
+        </div>
+
+        {/* Overlay blur loader when isAnalyzing is active */}
+        <AnimatePresence>
+          {isAnalyzing && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#09090b]/75 backdrop-blur-xl"
+            >
+              <motion.div
+                initial={{ scale: 0.96, y: 15 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.96, y: 15 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 120 }}
+                className="w-full max-w-xl"
+              >
+                <LoadingCard progress={progress} />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Premium error overlay modal (instead of browser alert) */}
+        <AnimatePresence>
+          {pipelineError && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setPipelineError(null)}
+                className="absolute inset-0 bg-[#09090b]/80 backdrop-blur-md"
+              />
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 15 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 120 }}
+                className="relative z-10 w-full max-w-md glass-panel border-red-500/20 bg-zinc-950/95 rounded-3xl p-6 sm:p-7 shadow-2xl overflow-hidden"
+              >
+                <div className="flex items-center space-x-2 text-[10px] font-bold text-red-400 uppercase tracking-widest mb-3 pb-3 border-b border-white/5 font-mono">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+                  <span>Pipeline Error</span>
+                </div>
+                <h3 className="text-sm font-bold text-white mb-2">Calibration Mismatch</h3>
+                <p className="text-xs text-slate-350 leading-relaxed font-light">
+                  {pipelineError}
+                </p>
+
+                <button
+                  onClick={() => setPipelineError(null)}
+                  className="mt-6 w-full py-3 text-xs font-bold uppercase tracking-widest text-zinc-950 bg-white hover:bg-slate-100 rounded-full transition-all cursor-pointer shadow-md"
+                >
+                  Acknowledge & Dismiss
+                </button>
+              </motion.div>
             </div>
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20">
-            <LoadingCard progress={progress} />
-          </div>
-        )}
+          )}
+        </AnimatePresence>
       </main>
 
       <Footer />

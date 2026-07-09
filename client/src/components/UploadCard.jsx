@@ -83,7 +83,7 @@ export default function UploadCard({ onUploadSuccess }) {
 
   return (
     <div className="w-full max-w-xl mx-auto px-4 select-none">
-      <div className="glass-panel bg-[#121215]/50 border border-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+      <div className="glass-panel glow-card bg-[#121215]/50 border border-white/5 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
         <div className="text-center mb-6">
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
             Speech Input Console

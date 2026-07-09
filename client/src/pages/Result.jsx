@@ -139,7 +139,7 @@ export default function Result() {
                 />
 
                 {/* Audio player with forwarded ref for seeking */}
-                <div className="glass-panel bg-[#121215]/50 border border-white/5 rounded-2xl p-4">
+                <div className="glass-panel glow-card bg-[#121215]/50 border border-white/5 rounded-2xl p-4">
                   <span className="text-[9px] text-slate-500 uppercase tracking-widest block mb-3 font-bold">
                     Uploaded Recording
                   </span>
