@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+// Auto-normalize: ensure the base URL always ends with /api
+const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BASE_URL = rawUrl.replace(/\/api\/?$/, '') + '/api';
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  baseURL: BASE_URL
 });
 
 /**
