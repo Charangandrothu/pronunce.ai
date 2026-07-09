@@ -52,3 +52,14 @@ export const analyzeAudio = async (fileId) => {
  * @param {string} id  fileId / sessionId
  */
 export const getAnalysis = async (id) => analyzeAudio(id);
+
+/**
+ * Pings the server to check connectivity and wake state.
+ * @param {number} [timeout=3000] - Request timeout in milliseconds
+ * @returns {Promise<any>}
+ */
+export const pingServer = async (timeout = 3000) => {
+  const response = await API.get('', { timeout });
+  return response.data;
+};
+

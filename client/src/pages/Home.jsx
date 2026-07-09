@@ -5,9 +5,9 @@ import Hero from '../components/Hero';
 import UploadCard from '../components/UploadCard';
 import LoadingCard from '../components/LoadingCard';
 import Footer from '../components/Footer';
-import { uploadAudio, analyzeAudio } from '../services/analysisService';
+import { uploadAudio, analyzeAudio, pingServer } from '../services/analysisService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2, CheckCircle2, X } from 'lucide-react';
 
 // Loading phases mapped to progress range
 const PHASES = [
@@ -21,6 +21,9 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing]   = useState(false);
   const [progress,    setProgress]      = useState(0);
   const [pipelineError, setPipelineError] = useState(null); // Local error modal state instead of browser alerts
+  const [serverStatus, setServerStatus] = useState('checking'); // 'checking', 'sleeping', 'online'
+  const [showWakeupBanner, setShowWakeupBanner] = useState(false);
+  const [wakingProgress, setWakingProgress] = useState(0);
   const navigate  = useNavigate();
   const location  = useLocation();
   const uploadRef = useRef(null);
@@ -35,6 +38,71 @@ export default function Home() {
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    let active = true;
+    let pollInterval = null;
+    let countdownInterval = null;
+
+    const checkServer = async () => {
+      try {
+        await pingServer(1800);
+        if (active) {
+          setServerStatus('online');
+          setShowWakeupBanner(false);
+        }
+      } catch (err) {
+        if (active) {
+          setServerStatus('sleeping');
+          setShowWakeupBanner(true);
+          startPolling();
+          startCountdown();
+        }
+      }
+    };
+
+    const startPolling = () => {
+      pollInterval = setInterval(async () => {
+        try {
+          await pingServer(2500);
+          if (active) {
+            setServerStatus('online');
+            setWakingProgress(100);
+            clearInterval(pollInterval);
+            if (countdownInterval) clearInterval(countdownInterval);
+            setTimeout(() => {
+              if (active) setShowWakeupBanner(false);
+            }, 3000);
+          }
+        } catch (e) {
+          // Keep polling
+        }
+      }, 4500);
+    };
+
+    const startCountdown = () => {
+      const totalSec = 50;
+      let elapsedSec = 0;
+      countdownInterval = setInterval(() => {
+        elapsedSec += 1;
+        const pct = Math.min(Math.round((elapsedSec / totalSec) * 100), 98);
+        if (active) {
+          setWakingProgress(pct);
+        }
+        if (elapsedSec >= totalSec) {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+    };
+
+    checkServer();
+
+    return () => {
+      active = false;
+      if (pollInterval) clearInterval(pollInterval);
+      if (countdownInterval) clearInterval(countdownInterval);
+    };
+  }, []);
 
   /**
    * Animates progress from `from` to `to` over `durationMs` milliseconds.
@@ -182,6 +250,76 @@ export default function Home() {
 
       <Navbar />
 
+      {/* Floating Server Wakeup Banner */}
+      <AnimatePresence>
+        {showWakeupBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-sm pointer-events-auto"
+          >
+            <div className="glass-panel bg-zinc-950/85 border border-white/8 rounded-2xl p-4 shadow-[0_12px_40px_rgba(0,0,0,0.6)] flex items-start space-x-3 relative overflow-hidden">
+              {/* Glowing progress line at the bottom */}
+              <div 
+                className="absolute bottom-0 left-0 h-[2.5px] bg-gradient-to-r from-amber-500/70 via-blue-500/70 to-emerald-500/70 transition-all duration-1000 ease-out" 
+                style={{ width: `${wakingProgress}%` }} 
+              />
+              
+              <div className="flex-shrink-0 mt-0.5">
+                {serverStatus === 'online' ? (
+                  <div className="relative flex items-center justify-center h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                    <CheckCircle2 className="h-4.5 w-4.5 animate-pulse" />
+                  </div>
+                ) : (
+                  <div className="relative flex items-center justify-center h-8 w-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                    <Loader2 className="h-4.5 w-4.5 animate-spin" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0 pr-6">
+                <p className="text-[11px] font-bold text-white uppercase tracking-wider font-mono flex items-center gap-1.5">
+                  {serverStatus === 'online' ? (
+                    <>
+                      <span>Server Operational</span>
+                      <span className="text-[8px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded font-mono font-bold">
+                        🟢 ONLINE
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Server Cold Start</span>
+                      <span className="text-[8px] bg-amber-500/10 border border-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded font-mono font-bold animate-pulse">
+                        💤 WAKING UP
+                      </span>
+                    </>
+                  )}
+                </p>
+                <p className="text-[10px] text-slate-350 font-light mt-1 leading-normal">
+                  {serverStatus === 'online'
+                    ? "Connection verified! The AI models are loaded and ready."
+                    : "Render puts the server to sleep after inactivity. Waking it up now; you can still select a file in the meantime!"}
+                </p>
+                {serverStatus !== 'online' && (
+                  <div className="mt-2.5 flex items-center justify-between text-[8px] font-mono text-slate-500">
+                    <span>Wake Progress: {wakingProgress}%</span>
+                    <span>Est. {Math.max(0, 50 - Math.round((wakingProgress / 100) * 50))}s</span>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => setShowWakeupBanner(false)}
+                className="absolute top-3 right-3 text-slate-500 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Multiple Radial background glow blobs */}
       <div className="radial-glow glow-purple top-[10%] left-[5%] w-[650px] h-[650px]"></div>
       <div className="radial-glow glow-cyan top-[30%] right-[5%] w-[600px] h-[600px]"></div>
@@ -209,7 +347,7 @@ export default function Home() {
                 transition={{ type: 'spring', damping: 25, stiffness: 120 }}
                 className="w-full max-w-xl"
               >
-                <LoadingCard progress={progress} />
+                <LoadingCard progress={progress} serverStatus={serverStatus} wakingProgress={wakingProgress} />
               </motion.div>
             </motion.div>
           )}
